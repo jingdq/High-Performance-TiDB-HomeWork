@@ -79,10 +79,10 @@ pd、tidb、tikv 编译代码均为**master分支**
 
 ## 添加事务日志
 
-![avatar](pic/376433C3-7FBD-4FCF-BAD5-02B68FC56305-20200816103222459.png)
+![avatar](https://github.com/jingdq/High-Performance-TiDB-HomeWork/blob/master/week1/High%20Performance%20TiDB%20HomeWork1.resources/376433C3-7FBD-4FCF-BAD5-02B68FC56305.png?raw=true)
 
 
-![avatar](pic/41D3DFEC-AE74-4ED6-B115-1AF7B3398226.png)
+![avatar](https://github.com/jingdq/High-Performance-TiDB-HomeWork/blob/master/week1/High%20Performance%20TiDB%20HomeWork1.resources/41D3DFEC-AE74-4ED6-B115-1AF7B3398226.png?raw=true)
 
  
 
