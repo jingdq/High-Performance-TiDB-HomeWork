@@ -443,11 +443,11 @@ runtime.rt0_go(0x7ffe62995608, 0x4, 0x7ffe62995608, 0x0, 0x0, 0x4, 0x7ffe6299685
 
 重启阿里云服务器后再次启动tidb集群测试，关键指标截图
 
-![](pics/tpc-h.png)
+![](pic/22.png)
 
-![](pics/tpc-h1.png)
+![](pic/23.png)
 
-![](pics/tpc-h2.png)
+![](pic/24.png)
 
 
 
@@ -469,13 +469,17 @@ runtime.rt0_go(0x7ffe62995608, 0x4, 0x7ffe62995608, 0x0, 0x0, 0x4, 0x7ffe6299685
 
 报错节点相关日志：
 
-url1
+https://github.com/jingdq/High-Performance-TiDB-HomeWork/blob/master/week2/tidb_172_25_185_6_4000.log
 
-url2
+https://github.com/jingdq/High-Performance-TiDB-HomeWork/blob/master/week2/tidb_172_25_185_7_4000.log
 
-完整日志：
+https://github.com/jingdq/High-Performance-TiDB-HomeWork/blob/master/week2/tidb_172_25_185_8_4000.log
 
-url
+https://github.com/jingdq/High-Performance-TiDB-HomeWork/blob/master/week2/tikv_172_25_185_8_20160.log
+
+错误完整日志：
+
+https://github.com/jingdq/High-Performance-TiDB-HomeWork/blob/master/week2/tidb_error_logs.tar
 
 ## 6.性能瓶颈分析
 
@@ -507,7 +511,7 @@ bin/go-tpc tpch run -H 101.200.239.97 -P 4000 -D tpch --sf 5
 
 在以上的硬件环境，拓扑配置及workload 下，从测试的表现来看 ,Update Index操作时瓶颈在于 TiDB组件，集群中tidb节点服务down掉，tiup重启集群后再次测试可以通过,go-tpc tpch 测试时 瓶颈在于集群硬件资源。
 
-具体技术问题需要自己逐步熟悉TiDB技术栈后深分析，暂且给出如上测试结论。
+具体技术问题需要自己逐步熟悉TiDB技术栈后深分析，暂且给出如上分析。
 
 ## 参考文章
 
