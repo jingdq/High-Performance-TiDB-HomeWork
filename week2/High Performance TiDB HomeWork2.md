@@ -81,9 +81,9 @@ alertmanager_servers:
  readpool.coprocessor.use-unified-pool: true
 ```
 
-部署集群
+部署集群(使用root账户)
 
-> tiup cluster deploy tidb-test v4.0.0 ./topology.yaml --user root [-p] [-i /home/root/.ssh/gcp_rsa]
+> tiup cluster deploy tidb-test v4.0.0 ./topology.yaml --user root 
 
 启动集群 
 
@@ -97,6 +97,12 @@ alertmanager_servers:
 
 > tiup cluster display tidb-test
 
+更新配置
+
+> tiup cluster edit-config tidb-test
+>
+> tiup cluster reload tidb-test
+
 连接tidb
 
 > mysql -u root -h 101.200.239.97 -P 4000
@@ -105,11 +111,44 @@ alertmanager_servers:
 
 Read-Only测试截图
 
-> sysbench --config-file=config oltp_read_only --threads=4 --tables=32 --table-size=10000 run
+> sysbench --config-file=config oltp_read_only --threads=128 --tables=32 --table-size=10000 run
+
+![](pic/00.png)
 
 ![测试只读cpu和qps截图](pic/01.png)
 
 ![测试只读grps qps 和延时截图](pic/02.png)
+
+```
+SQL statistics:
+    queries performed:
+        read:                            2616754
+        write:                           0
+        other:                           373822
+        total:                           2990576
+    transactions:                        186911 (309.85 per sec.)
+    queries:                             2990576 (4957.61 per sec.)
+    ignored errors:                      0      (0.00 per sec.)
+    reconnects:                          0      (0.00 per sec.)
+
+General statistics:
+    total time:                          603.2278s
+    total number of events:              186911
+
+Latency (ms):
+         min:                                   61.93
+         avg:                                  411.02
+         max:                                 7003.17
+         95th percentile:                     1013.60
+         sum:                             76824454.58
+
+Threads fairness:
+    events (avg/stddev):           1460.2422/61.28
+    execution time (avg/stddev):   600.1911/0.29
+
+```
+
+
 
 Point Select 
 
@@ -126,97 +165,33 @@ Point Select
 
 
 ```
-Running the test with following options:
-Number of threads: 4
-Report intermediate results every 10 second(s)
-Initializing random number generator from current time
-Initializing worker threads...
-Threads started!
-[ 10s ] thds: 4 tps: 61.79 qps: 991.45 (r/w/o: 867.47/0.00/123.98) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 20s ] thds: 4 tps: 62.60 qps: 1002.71 (r/w/o: 877.51/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 30s ] thds: 4 tps: 62.70 qps: 1002.00 (r/w/o: 876.60/0.00/125.40) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 40s ] thds: 4 tps: 62.60 qps: 1004.00 (r/w/o: 878.80/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 50s ] thds: 4 tps: 62.80 qps: 1003.10 (r/w/o: 877.50/0.00/125.60) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 60s ] thds: 4 tps: 62.60 qps: 1000.50 (r/w/o: 875.40/0.00/125.10) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 70s ] thds: 4 tps: 62.60 qps: 1002.20 (r/w/o: 876.90/0.00/125.30) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 80s ] thds: 4 tps: 62.50 qps: 1000.69 (r/w/o: 875.80/0.00/124.90) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 90s ] thds: 4 tps: 62.70 qps: 1001.81 (r/w/o: 876.31/0.00/125.50) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 100s ] thds: 4 tps: 62.70 qps: 1005.10 (r/w/o: 879.70/0.00/125.40) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 110s ] thds: 4 tps: 62.80 qps: 1002.90 (r/w/o: 877.30/0.00/125.60) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 120s ] thds: 4 tps: 62.50 qps: 1001.20 (r/w/o: 876.30/0.00/124.90) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 130s ] thds: 4 tps: 62.90 qps: 1006.00 (r/w/o: 880.10/0.00/125.90) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 140s ] thds: 4 tps: 62.50 qps: 1001.10 (r/w/o: 876.10/0.00/125.00) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 150s ] thds: 4 tps: 62.70 qps: 1002.60 (r/w/o: 877.30/0.00/125.30) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 160s ] thds: 4 tps: 63.00 qps: 1006.00 (r/w/o: 879.90/0.00/126.10) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 170s ] thds: 4 tps: 62.20 qps: 996.50 (r/w/o: 872.10/0.00/124.40) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 180s ] thds: 4 tps: 62.70 qps: 1002.51 (r/w/o: 877.10/0.00/125.40) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 190s ] thds: 4 tps: 62.50 qps: 1001.60 (r/w/o: 876.60/0.00/125.00) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 200s ] thds: 4 tps: 62.50 qps: 1000.80 (r/w/o: 875.80/0.00/125.00) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 210s ] thds: 4 tps: 62.60 qps: 1001.00 (r/w/o: 875.80/0.00/125.20) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 220s ] thds: 4 tps: 62.50 qps: 1000.10 (r/w/o: 875.10/0.00/125.00) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 230s ] thds: 4 tps: 62.80 qps: 1003.70 (r/w/o: 878.10/0.00/125.60) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 240s ] thds: 4 tps: 62.50 qps: 1001.90 (r/w/o: 876.90/0.00/125.00) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 250s ] thds: 4 tps: 63.00 qps: 1004.90 (r/w/o: 878.90/0.00/126.00) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 260s ] thds: 4 tps: 62.60 qps: 1002.50 (r/w/o: 877.30/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 270s ] thds: 4 tps: 62.30 qps: 997.70 (r/w/o: 873.10/0.00/124.60) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 280s ] thds: 4 tps: 62.50 qps: 999.50 (r/w/o: 874.50/0.00/125.00) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 290s ] thds: 4 tps: 62.60 qps: 1000.80 (r/w/o: 875.70/0.00/125.10) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 300s ] thds: 4 tps: 62.50 qps: 1001.60 (r/w/o: 876.50/0.00/125.10) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 310s ] thds: 4 tps: 62.60 qps: 1000.70 (r/w/o: 875.50/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 320s ] thds: 4 tps: 62.60 qps: 1001.40 (r/w/o: 876.20/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 330s ] thds: 4 tps: 62.20 qps: 996.90 (r/w/o: 872.50/0.00/124.40) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 340s ] thds: 4 tps: 62.30 qps: 994.70 (r/w/o: 870.20/0.00/124.50) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 350s ] thds: 4 tps: 62.50 qps: 999.80 (r/w/o: 874.70/0.00/125.10) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 360s ] thds: 4 tps: 62.30 qps: 999.50 (r/w/o: 874.90/0.00/124.60) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 370s ] thds: 4 tps: 62.60 qps: 1000.00 (r/w/o: 874.80/0.00/125.20) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 380s ] thds: 4 tps: 62.40 qps: 997.80 (r/w/o: 873.00/0.00/124.80) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 390s ] thds: 4 tps: 62.60 qps: 999.60 (r/w/o: 874.60/0.00/125.00) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 400s ] thds: 4 tps: 62.40 qps: 1000.60 (r/w/o: 875.60/0.00/125.00) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 410s ] thds: 4 tps: 62.40 qps: 998.90 (r/w/o: 874.10/0.00/124.80) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 420s ] thds: 4 tps: 62.40 qps: 998.20 (r/w/o: 873.40/0.00/124.80) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 430s ] thds: 4 tps: 62.60 qps: 1002.00 (r/w/o: 876.80/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 440s ] thds: 4 tps: 62.60 qps: 1002.30 (r/w/o: 877.10/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 450s ] thds: 4 tps: 62.70 qps: 1002.30 (r/w/o: 876.90/0.00/125.40) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 460s ] thds: 4 tps: 62.60 qps: 1001.50 (r/w/o: 876.30/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 470s ] thds: 4 tps: 62.50 qps: 999.90 (r/w/o: 874.90/0.00/125.00) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 480s ] thds: 4 tps: 62.60 qps: 1000.80 (r/w/o: 875.60/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 490s ] thds: 4 tps: 62.40 qps: 999.90 (r/w/o: 875.10/0.00/124.80) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 500s ] thds: 4 tps: 62.50 qps: 999.20 (r/w/o: 874.20/0.00/125.00) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 510s ] thds: 4 tps: 62.20 qps: 997.10 (r/w/o: 872.70/0.00/124.40) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 520s ] thds: 4 tps: 62.40 qps: 997.80 (r/w/o: 873.00/0.00/124.80) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 530s ] thds: 4 tps: 62.60 qps: 1002.30 (r/w/o: 877.10/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 540s ] thds: 4 tps: 62.60 qps: 1000.80 (r/w/o: 875.60/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 550s ] thds: 4 tps: 62.60 qps: 1001.60 (r/w/o: 876.40/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 560s ] thds: 4 tps: 62.70 qps: 1001.30 (r/w/o: 875.90/0.00/125.40) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 570s ] thds: 4 tps: 62.60 qps: 1001.30 (r/w/o: 876.10/0.00/125.20) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 580s ] thds: 4 tps: 62.40 qps: 1000.60 (r/w/o: 875.80/0.00/124.80) lat (ms,95%): 71.83 err/s: 0.00 reconn/s: 0.00
-[ 590s ] thds: 4 tps: 61.70 qps: 985.90 (r/w/o: 862.50/0.00/123.40) lat (ms,95%): 73.13 err/s: 0.00 reconn/s: 0.00
-[ 600s ] thds: 4 tps: 48.30 qps: 775.10 (r/w/o: 678.50/0.00/96.60) lat (ms,95%): 95.81 err/s: 0.00 reconn/s: 0.00
+
 SQL statistics:
     queries performed:
-        read:                            523334
+        read:                            15957575
         write:                           0
-        other:                           74762
-        total:                           598096
-    transactions:                        37381  (62.29 per sec.)
-    queries:                             598096 (996.71 per sec.)
+        other:                           0
+        total:                           15957575
+    transactions:                        15957575 (26595.31 per sec.)
+    queries:                             15957575 (26595.31 per sec.)
     ignored errors:                      0      (0.00 per sec.)
     reconnects:                          0      (0.00 per sec.)
 
 General statistics:
-    total time:                          600.0704s
-    total number of events:              37381
+    total time:                          600.0132s
+    total number of events:              15957575
 
 Latency (ms):
-         min:                                   56.01
-         avg:                                   64.21
-         max:                                  773.01
-         95th percentile:                       73.13
-         sum:                              2400150.98
+         min:                                    3.30
+         avg:                                    4.81
+         max:                                   75.45
+         95th percentile:                        5.67
+         sum:                             76795124.57
 
 Threads fairness:
-    events (avg/stddev):           9345.2500/720.62
-    execution time (avg/stddev):   600.0377/0.02
+    events (avg/stddev):           124668.5547/13390.15
+    execution time (avg/stddev):   599.9619/0.01
+
 ```
 
 Update Index 测试截图
@@ -229,53 +204,231 @@ Update Index 测试截图
 
 ![更新索引QPS和延迟](pic/08.png)
 
+```
+SQL statistics:
+    queries performed:
+        read:                            0
+        write:                           5745269
+        other:                           0
+        total:                           5745269
+    transactions:                        5745269 (9573.00 per sec.)
+    queries:                             5745269 (9573.00 per sec.)
+    ignored errors:                      0      (0.00 per sec.)
+    reconnects:                          0      (0.00 per sec.)
+
+General statistics:
+    total time:                          600.1523s
+    total number of events:              5745269
+
+Latency (ms):
+         min:                                    4.76
+         avg:                                   13.37
+         max:                                 1073.32
+         95th percentile:                       24.38
+         sum:                             76798982.92
+
+Threads fairness:
+    events (avg/stddev):           44884.9141/2172.06
+    execution time (avg/stddev):   599.9921/0.02
+
+```
+
 
 
 go-ycsb
 
 >  ./bin/go-ycsb load mysql -P workloads/workloada -p recordcount=10000 -p mysql.host=101.200.239.97 -p mysql.port=4000 --threads 128
 >
->  ./bin/go-ycsb load mysql -P workloads/workloada -p recordcount=10000 -p mysql.host=101.200.239.97 -p mysql.port=4000 --threads 256
+>  ./bin/go-ycsb run mysql -P workloads/workloada -p recordcount=10000 -p mysql.host=101.200.239.97 -p mysql.port=4000 --threads 256
 
 ```
+
+***************** properties *****************
+"insertproportion"="0"
+"readallfields"="true"
+"updateproportion"="0.5"
+"operationcount"="1000"
+"workload"="core"
+"requestdistribution"="uniform"
+"recordcount"="10000"
+"mysql.port"="4000"
+"readproportion"="0.5"
+"dotransactions"="true"
+"threadcount"="256"
+"scanproportion"="0"
+**********************************************
+Run finished, takes 1.655856322s
+READ   - Takes(s): 1.6, Count: 362, OPS: 223.1, Avg(us): 23959, Min(us): 4576, Max(us): 76291, 99th(us): 69000, 99.9th(us): 77000, 99.99th(us): 77000
+UPDATE - Takes(s): 1.6, Count: 405, OPS: 250.8, Avg(us): 36496, Min(us): 6038, Max(us): 85346, 99th(us): 82000, 99.9th(us): 86000, 99.99th(us): 86000
+
 
 ***************** properties *****************
 "workload"="core"
-"scanproportion"="0"
-"requestdistribution"="uniform"
-"readallfields"="true"
-"dotransactions"="false"
-"threadcount"="256"
-"recordcount"="10000"
-"operationcount"="1000"
-"updateproportion"="0.5"
+"dotransactions"="true"
 "readproportion"="0.5"
-
-**********************************************
-Run finished, takes 2.438908151s
-INSERT - Takes(s): 2.4, Count: 9984, OPS: 4129.0, Avg(us): 8965, Min(us): 2610, Max(us): 31861, 99th(us): 22000, 99.9th(us): 30000, 99.99th(us): 32000
-
-
-***************** properties *****************
-"threadcount"="256"
 "updateproportion"="0.5"
 "scanproportion"="0"
 "insertproportion"="0"
+"requestdistribution"="uniform"
+"operationcount"="1000"
+"readallfields"="true"
 "recordcount"="100000"
+"mysql.port"="4000"
+"threadcount"="256"
 **********************************************
-INSERT - Takes(s): 10.0, Count: 99840, OPS: 9991.0, Avg(us): 17350, Min(us): 2592, Max(us): 1870513, 99th(us): 222000, 99.9th(us): 631000, 99.99th(us): 849000
-Run finished, takes 10.287864879s
-INSERT - Takes(s): 10.3, Count: 99840, OPS: 9711.8, Avg(us): 17350, Min(us): 2592, Max(us): 1870513, 99th(us): 222000, 99.9th(us): 631000, 99.99th(us): 849000
+Run finished, takes 1.654352524s
+READ   - Takes(s): 1.6, Count: 389, OPS: 237.7, Avg(us): 57952, Min(us): 4326, Max(us): 158750, 99th(us): 151000, 99.9th(us): 159000, 99.99th(us): 159000
+UPDATE - Takes(s): 1.6, Count: 379, OPS: 235.3, Avg(us): 67763, Min(us): 7112, Max(us): 159898, 99th(us): 153000, 99.9th(us): 160000, 99.99th(us): 160000
 
+***************** properties *****************
+"insertproportion"="0"
+"recordcount"="1000000"
+"mysql.port"="4000"
+"workload"="core"
+"operationcount"="1000"
+"dotransactions"="true"
+"threadcount"="256"
+"readallfields"="true"
+"updateproportion"="0.5"
+"scanproportion"="0"
+"requestdistribution"="uniform"
+"readproportion"="0.5"
+**********************************************
+Run finished, takes 255.700502ms
+READ   - Takes(s): 0.2, Count: 378, OPS: 1577.3, Avg(us): 55258, Min(us): 4852, Max(us): 168412, 99th(us): 167000, 99.9th(us): 169000, 99.99th(us): 169000
+UPDATE - Takes(s): 0.2, Count: 390, OPS: 1867.9, Avg(us): 57553, Min(us): 8043, Max(us): 169168, 99th(us): 141000, 99.9th(us): 170000, 99.99th(us): 170000
 
 
 ```
 
-![](pic/16.png)
 
-![](pic/17.png)
 
-![](pic/18.png)
+workloadb
+
+```
+***************** properties *****************
+"mysql.port"="4000"
+"threadcount"="256"
+"readproportion"="0.95"
+"readallfields"="true"
+"requestdistribution"="uniform"
+"workload"="core"
+"insertproportion"="0"
+"dotransactions"="true"
+"scanproportion"="0"
+"operationcount"="1000"
+"mysql.host"="101.200.121.46"
+"updateproportion"="0.05"
+"recordcount"="10000"
+**********************************************
+Run finished, takes 88.191178ms
+READ   - Takes(s): 0.1, Count: 741, OPS: 9597.7, Avg(us): 15049, Min(us): 5023, Max(us): 44602, 99th(us): 37000, 99.9th(us): 45000, 99.99th(us): 45000
+UPDATE - Takes(s): 0.0, Count: 27, OPS: 693.0, Avg(us): 21976, Min(us): 10381, Max(us): 38235, 99th(us): 39000, 99.9th(us): 39000, 99.99th(us): 39000
+
+```
+
+workloadc
+
+```
+***************** properties *****************
+"workload"="core"
+"insertproportion"="0"
+"recordcount"="10000"
+"requestdistribution"="uniform"
+"mysql.port"="4000"
+"scanproportion"="0"
+"threadcount"="256"
+"dotransactions"="true"
+"updateproportion"="0"
+"operationcount"="1000"
+"readallfields"="true"
+"readproportion"="1"
+"mysql.host"="101.200.121.46"
+**********************************************
+Run finished, takes 1.635710259s
+READ   - Takes(s): 1.6, Count: 768, OPS: 473.4, Avg(us): 12647, Min(us): 4582, Max(us): 37271, 99th(us): 34000, 99.9th(us): 38000, 99.99th(us): 38000
+
+```
+
+workloadd
+
+```
+***************** properties *****************
+"updateproportion"="0"
+"workload"="core"
+"readproportion"="0.95"
+"dotransactions"="true"
+"threadcount"="256"
+"scanproportion"="0"
+"mysql.port"="4000"
+"requestdistribution"="latest"
+"insertproportion"="0.05"
+"operationcount"="1000"
+"mysql.host"="101.200.121.46"
+"recordcount"="10000"
+"readallfields"="true"
+**********************************************
+Run finished, takes 1.642859001s
+INSERT - Takes(s): 1.6, Count: 46, OPS: 28.5, Avg(us): 11324, Min(us): 7251, Max(us): 16460, 99th(us): 17000, 99.9th(us): 17000, 99.99th(us): 17000
+READ   - Takes(s): 1.6, Count: 722, OPS: 442.3, Avg(us): 9781, Min(us): 4298, Max(us): 26517, 99th(us): 26000, 99.9th(us): 27000, 99.99th(us): 27000
+
+```
+
+
+
+workloade
+
+```
+***************** properties *****************
+"dotransactions"="true"
+"insertproportion"="0.05"
+"scanlengthdistribution"="uniform"
+"mysql.host"="101.200.121.46"
+"maxscanlength"="1"
+"mysql.port"="4000"
+"operationcount"="1000"
+"updateproportion"="0"
+"threadcount"="256"
+"readproportion"="0"
+"recordcount"="10000"
+"scanproportion"="0.95"
+"readallfields"="true"
+"workload"="core"
+"requestdistribution"="uniform"
+**********************************************
+Run finished, takes 1.64064701s
+INSERT - Takes(s): 1.6, Count: 35, OPS: 21.9, Avg(us): 18041, Min(us): 9122, Max(us): 39857, 99th(us): 40000, 99.9th(us): 40000, 99.99th(us): 40000
+SCAN   - Takes(s): 1.6, Count: 733, OPS: 451.8, Avg(us): 21992, Min(us): 5058, Max(us): 78730, 99th(us): 55000, 99.9th(us): 79000, 99.99th(us): 79000
+
+```
+
+workloadf
+
+```
+***************** properties *****************
+"mysql.host"="101.200.121.46"
+"recordcount"="10000"
+"workload"="core"
+"operationcount"="1000"
+"readproportion"="0.5"
+"mysql.port"="4000"
+"readmodifywriteproportion"="0.5"
+"requestdistribution"="uniform"
+"threadcount"="256"
+"readallfields"="true"
+"dotransactions"="true"
+"scanproportion"="0"
+"insertproportion"="0"
+"updateproportion"="0"
+**********************************************
+Run finished, takes 143.649124ms
+READ   - Takes(s): 0.1, Count: 768, OPS: 5713.1, Avg(us): 14865, Min(us): 4514, Max(us): 32148, 99th(us): 30000, 99.9th(us): 33000, 99.99th(us): 33000
+READ_MODIFY_WRITE - Takes(s): 0.1, Count: 384, OPS: 4475.6, Avg(us): 41657, Min(us): 11494, Max(us): 69718, 99th(us): 68000, 99.9th(us): 70000, 99.99th(us): 70000
+UPDATE - Takes(s): 0.1, Count: 384, OPS: 4472.2, Avg(us): 26874, Min(us): 5971, Max(us): 44773, 99th(us): 45000, 99.9th(us): 45000, 99.99th(us): 45000
+
+```
+
+
 
 Tpc-c
 
@@ -283,7 +436,7 @@ Tpc-c
 >
 > ./bin/go-tpc tpcc -H 101.200.239.97 -P 4000 -D tpcc --warehouses 20 run
 
-![](pic/19%20.png)
+![](pic/19.png)
 
 ![](pic/20.png)
 
@@ -495,21 +648,20 @@ https://github.com/jingdq/High-Performance-TiDB-HomeWork/blob/master/week2/tidb_
 
 ```shell
 
-sysbench --config-file=config oltp_read_only --threads=4 --tables=32 --table-size=10000 run
+sysbench --config-file=config oltp_read_only --threads=128 --tables=32 --table-size=10000 run
 
 sysbench --config-file=config oltp_point_select --threads=128 --tables=32 --table-size=10000 run
 
 sysbench --config-file=config oltp_update_index --threads=128 --tables=32 --table-size=10000 run
 
-bin/go-ycsb load mysql -P workloads/workloada -p recordcount=10000 -p mysql.host=101.200.239.97 -p mysql.port=4000 --threads 256
+bin/go-ycsb run mysql -P workloads/workloada -p recordcount=10000 -p mysql.host=101.200.121.46 -p mysql.port=4000 --threads 256
 
-bin/go-tpc tpcc -H 101.200.239.97 -P 4000 -D tpcc --warehouses 20 run
+bin/go-tpc tpcc -H 101.200.121.46 -P 4000 -D tpcc --warehouses 20 run
 
-bin/go-tpc tpch run -H 101.200.239.97 -P 4000 -D tpch --sf 5
-
+bin/go-tpc tpch run -H 101.200.121.46 -P 4000 -D tpch --sf 5
 ```
 
-在以上的硬件环境，拓扑配置及workload 下，从测试的表现来看 ,Update Index操作时瓶颈在于 TiDB组件，集群中tidb节点服务down掉，tiup重启集群后再次测试可以通过,go-tpc tpch 测试时 瓶颈在于集群硬件资源。
+在以上的硬件环境，拓扑配置及workload 下，从测试的表现来看 ,Update Index操作时瓶颈在于 TiDB组件，测试过程中集群中tidb节点服务down掉，tiup重启集群后再次测试可以通过,go-tpc tpch 测试时 瓶颈在于集群硬件资源。
 
 具体技术问题需要自己逐步熟悉TiDB技术栈后深分析，暂且给出如上分析。
 
@@ -528,6 +680,8 @@ tidb配置文件
 https://docs.pingcap.com/zh/tidb/stable/tidb-configuration-file
 
 tiup 配置:https://github.com/pingcap/tiup/blob/master/examples/topology.example.yaml
+
+tiup详细使用：https://github.com/pingcap/tiup/blob/master/doc/user/cluster.md
 
 TiDB配置:
 
